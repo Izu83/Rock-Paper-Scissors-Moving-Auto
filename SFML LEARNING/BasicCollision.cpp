@@ -2,6 +2,51 @@
 #include <SFML/Window.hpp>
 #include <iostream>
 #include <vector>
+#include <cmath>
+#include <map>
+
+/*
+
+	| is for done
+	\ is for not done
+	/ is for almost done
+
+	TODO :
+		- Make moving function /
+			/ Make running away
+		- Make collision checking \
+		- Change pics \
+		- Change dimensions \
+		- Change controls \
+		- Make it compatible with other computers \
+
+*/
+
+void move(sf::Sprite &moving_sprite, std::vector<sf::Sprite> &target_sprites, float speed)
+{
+	if (target_sprites.size() == 0)
+	{
+		return;
+	}
+	sf::Vector2f closest_pos = target_sprites.at(0).getPosition();
+	for (auto it = target_sprites.begin(); it != target_sprites.end(); it++)
+	{
+		sf::Vector2f temp_pos = (*it).getPosition();
+		if (closest_pos.x <= temp_pos.x && closest_pos.y <= temp_pos.y)
+		{
+			closest_pos.x = temp_pos.x;
+			closest_pos.y = temp_pos.y;
+		}
+	}
+	sf::Vector2f moving_sprite_pos = moving_sprite.getPosition();	
+	sf::Vector2f direction = closest_pos - moving_sprite_pos;
+	float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+	if (distance > speed)
+	{
+		direction = direction / distance * speed;
+	}
+	moving_sprite.move(direction);
+}
 
 int main()
 {	
@@ -81,6 +126,20 @@ int main()
 				}
 			}
 		}
+
+		for (auto it = rocks.begin(); it != rocks.end(); it++)
+		{
+			move(*it, scissors, 1);
+		}
+		for (auto it = papers.begin(); it != papers.end(); it++)
+		{
+			move(*it, rocks, 1);
+		}
+		for (auto it = scissors.begin(); it != scissors.end(); it++)
+		{
+			move(*it, papers, 1);
+		}
+		
 
 		window.clear(sf::Color::White);
 
