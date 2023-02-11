@@ -22,6 +22,10 @@
 
 */
 
+std::vector<sf::Sprite> rocks;
+std::vector<sf::Sprite> papers;
+std::vector<sf::Sprite> scissors;
+
 void move(sf::Sprite &moving_sprite, std::vector<sf::Sprite> &target_sprites, float speed)
 {
 	if (target_sprites.size() == 0)
@@ -48,8 +52,29 @@ void move(sf::Sprite &moving_sprite, std::vector<sf::Sprite> &target_sprites, fl
 	moving_sprite.move(direction);
 }
 
+// You kill the second one
+void check_collision(std::vector<sf::Sprite>& master_sprites, std::vector<sf::Sprite>& slave_sprites, sf::Texture& master_texture, sf::Texture& slave_texture)
+{
+	for (size_t i = 0; i < master_sprites.size(); i++)
+	{
+		for (size_t j = 0; j < slave_sprites.size(); j++)
+		{
+			if (master_sprites.at(i).getGlobalBounds().intersects(slave_sprites.at(j).getGlobalBounds()))
+			{
+				auto prev_pos = slave_sprites.at(j).getPosition();
+				slave_sprites.erase(slave_sprites.begin() + j);
+				sf::Sprite new_sprite(master_texture);
+				new_sprite.setPosition(prev_pos);
+				master_sprites.push_back(new_sprite);
+				break;
+			}
+		}
+	}
+}
+
+
 int main()
-{	
+{
 	// Rendering window
 	sf::RenderWindow window(sf::VideoMode(700, 900), "Rock, Paper, Scissors (RPS)");
 	window.setFramerateLimit(60);
@@ -82,9 +107,6 @@ int main()
 	}
 
 	// Vectors of sprites
-	std::vector<sf::Sprite> rocks;
-	std::vector<sf::Sprite> papers;
-	std::vector<sf::Sprite> scissors;
 
 	// Main loop
 	while (window.isOpen())
@@ -103,7 +125,7 @@ int main()
 				if (event.key.code == sf::Keyboard::R)
 				{
 					sf::Sprite rock(rock_texture);
-					sf::Vector2i mousePos = sf::Mouse::getPosition(window) - sf::Vector2i(16, 16);
+					sf::Vector2i mousePos = sf::Mouse::getPosition(window) - sf::Vector2i(32, 32);
 					sf::Vector2f worldPos = window.mapPixelToCoords(mousePos);
 					rock.setPosition(worldPos); 
 					rocks.push_back(rock);
@@ -111,7 +133,7 @@ int main()
 				if (event.key.code == sf::Keyboard::S)
 				{
 					sf::Sprite scissor(scissor_texture);
-					sf::Vector2i mousePos = sf::Mouse::getPosition(window) - sf::Vector2i(16, 16);
+					sf::Vector2i mousePos = sf::Mouse::getPosition(window) - sf::Vector2i(32, 32);
 					sf::Vector2f worldPos = window.mapPixelToCoords(mousePos);
 					scissor.setPosition(worldPos);
 					scissors.push_back(scissor);
@@ -119,13 +141,17 @@ int main()
 				if (event.key.code == sf::Keyboard::P)
 				{
 					sf::Sprite paper(paper_texture);
-					sf::Vector2i mousePos = sf::Mouse::getPosition(window) - sf::Vector2i(16, 16);
+					sf::Vector2i mousePos = sf::Mouse::getPosition(window) - sf::Vector2i(32, 32);
 					sf::Vector2f worldPos = window.mapPixelToCoords(mousePos);
 					paper.setPosition(worldPos);
 					papers.push_back(paper);
 				}
 			}
 		}
+
+		check_collision(rocks, scissors, rock_texture, scissor_texture);
+		check_collision(papers, rocks, paper_texture, rock_texture);
+		check_collision(scissors, papers, scissor_texture, paper_texture);
 
 		for (auto it = rocks.begin(); it != rocks.end(); it++)
 		{
