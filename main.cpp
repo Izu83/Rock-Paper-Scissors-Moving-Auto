@@ -27,11 +27,28 @@ std::vector<sf::CircleShape> circles;
 void running_away(sf::Sprite&, std::vector<sf::Sprite>&, float);
 void move(sf::Sprite&,std::vector<sf::Sprite>&,float);
 void check_collision(std::vector<sf::Sprite>&, std::vector<sf::Sprite>&, sf::Texture&, sf::Texture&);
+void check_collision_window(sf::RenderWindow&, std::vector<sf::Sprite>&);
 
 std::vector<sf::Sprite> rocks;
 std::vector<sf::Sprite> papers;
 std::vector<sf::Sprite> scissors;
-// * ^ Vectors are needed for displaying and moving, checking collision, and pretty much everything *
+// * ^ Vectors are needed for displaying and moving, checking co llision, and pretty much everything *
+
+/*
+ ! On the first you put the window,
+ ! on the second (final) you put the sprite you want to check the collision for
+*/
+void check_collision_window(sf::RenderWindow& window, sf::Sprite& sprite)
+{
+	if (sprite.getPosition().x > window.getSize().x - 32)
+		sprite.move(-1.f, 0.f);
+	if (sprite.getPosition().x < 0.f)
+		sprite.move(1.f, 0.f);
+	if (sprite.getPosition().y > window.getSize().y - 32)
+		sprite.move(0.f, -1.f);
+	if (sprite.getPosition().y < 0.f)
+		sprite.move(0.f, 1.f);
+}
 
 /*
  ! On the first you put the sprite you want to run away,
@@ -40,28 +57,23 @@ std::vector<sf::Sprite> scissors;
 */
 void running_away(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& enemy_sprites, float speed)
 {
-    float radius = 65.0f;
-    sf::CircleShape circle(radius);
-    circle.setPosition(moving_sprite.getPosition().x + moving_sprite.getGlobalBounds().width / 2 - radius,
-                       moving_sprite.getPosition().y + moving_sprite.getGlobalBounds().height / 2 - radius);
-    
-    for (auto it = enemy_sprites.begin(); it != enemy_sprites.end(); it++)
-    {
-        if (circle.getGlobalBounds().intersects((*it).getGlobalBounds()))
-        {
-            std::mt19937 random_generator(time(0));
-            std::uniform_int_distribution<int> distribution(0, -179);
-            int random_angle = distribution(random_generator);
-            
-            sf::Vector2f direction(cos(random_angle), sin(random_angle));
-            float magnitude = std::sqrt(std::pow(direction.x, 2) + std::pow(direction.y, 2));
-            direction.x = direction.x / magnitude * speed;
-            direction.y = direction.y / magnitude * speed;
-            
-            moving_sprite.move(direction);
-            break;
-        }
-    }
+	float radius = 25.0f;
+	sf::CircleShape circle(radius);
+	circle.setPosition(moving_sprite.getPosition().x + moving_sprite.getGlobalBounds().width / 2 - radius,
+					   moving_sprite.getPosition().y + moving_sprite.getGlobalBounds().height / 2 - radius);
+	
+	for (auto it = enemy_sprites.begin(); it != enemy_sprites.end(); it++)
+	{
+		if (circle.getGlobalBounds().intersects((*it).getGlobalBounds()))
+		{
+			sf::Vector2f direction = (*it).getPosition() - moving_sprite.getPosition();
+			float length = std::sqrt(std::pow(direction.x, 2) + std::pow(direction.y, 2));
+			direction = -direction / length;
+			direction = direction * speed;
+			moving_sprite.move(direction);
+			break;
+		}
+	}
 }
 
 /*
@@ -69,7 +81,7 @@ void running_away(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& enemy_spri
  ! and the sprite you want to move to the right !
  ! the last ons is the speed you want the moving_sprite to move with !
 */
-void move(sf::Sprite &moving_sprite, std::vector<sf::Sprite> &target_sprites, float speed)
+void move(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& target_sprites, float speed)
 {
 	// * This avoids exception DividingByZero *
 	if (target_sprites.size() == 0)
@@ -241,16 +253,30 @@ int main()
 			}
 		}
 		
+		// * Checking collision for the sprites and the window
+		for (auto it = rocks.begin() ; it != rocks.end() ; it++)
+		{
+			check_collision_window(window, *it);
+		}
+		for (auto it = papers.begin() ; it!= papers.end() ; it++)
+		{
+			check_collision_window(window, *it);
+		}
+		for (auto it = scissors.begin() ; it!= scissors.end() ; it++)
+		{
+			check_collision_window(window, *it);
+		}
+
 		// * Checking for running away with the rules *
-		for (auto it = rocks.begin(); it != rocks.end(); ++it)
+		for (auto it = rocks.begin() ; it != rocks.end() ; ++it)
 		{
 			running_away(*it, papers, 1.f);
 		}
-		for (auto it = papers.begin(); it!= papers.end(); ++it)
+		for (auto it = papers.begin() ; it!= papers.end() ; ++it)
 		{
 			running_away(*it, scissors, 1.f);
 		}
-		for (auto it = scissors.begin(); it!= scissors.end(); ++it)
+		for (auto it = scissors.begin() ; it!= scissors.end() ; ++it)
 		{
 			running_away(*it, rocks, 1.f);
 		}
@@ -261,15 +287,15 @@ int main()
 		check_collision(scissors, papers, scissor_texture, paper_texture);
 
 		// * Moving every vector *
-		for (auto it = rocks.begin(); it != rocks.end(); it++)
+		for (auto it = rocks.begin() ; it != rocks.end() ; it++)
 		{
 			move(*it, scissors, 1);
 		}
-		for (auto it = papers.begin(); it != papers.end(); it++)
+		for (auto it = papers.begin() ; it != papers.end() ; it++)
 		{
 			move(*it, rocks, 1);
 		}
-		for (auto it = scissors.begin(); it != scissors.end(); it++)
+		for (auto it = scissors.begin() ; it != scissors.end() ; it++)
 		{
 			move(*it, papers, 1);
 		}
