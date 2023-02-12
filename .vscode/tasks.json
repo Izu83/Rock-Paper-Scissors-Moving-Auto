@@ -1,0 +1,32 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compile Main",
+            "type": "shell",
+            "command": "g++ -IC:\\SFML-2.5.1\\include -c main.cpp -o main.o",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Link Executable",
+            "type": "shell",
+            "command": "g++ -I\"C\\SFML-2.5.1\\include\" -L\"C\\SFML-2.5.1\\lib\" main.o -o app.exe -lmingw32 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-main",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run Executable",
+            "type": "shell",
+            "command": "start app.exe",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
