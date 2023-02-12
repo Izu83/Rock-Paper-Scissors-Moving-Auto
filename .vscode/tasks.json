@@ -13,7 +13,7 @@
         {
             "label": "Link Executable",
             "type": "shell",
-            "command": "g++ -I\"C\\SFML-2.5.1\\include\" -L\"C\\SFML-2.5.1\\lib\" main.o -o app.exe -lmingw32 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-main",
+            "command": "g++ -I\"C:\\SFML-2.5.1\\include\" -L\"C:\\SFML-2.5.1\\lib\" main.o -o app.exe -lmingw32 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-main",
             "group": {
                 "kind": "build",
                 "isDefault": true
