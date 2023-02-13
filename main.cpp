@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <stdlib.h>
+#include <iomanip>
 #include <stdio.h>
 #include <vector>
 #include <random>
@@ -24,15 +25,39 @@ std::vector<sf::CircleShape> circles;
 */
 
 // * Function prototypes *
-void running_away(sf::Sprite&, std::vector<sf::Sprite>&, float);
-void move(sf::Sprite&,std::vector<sf::Sprite>&,float);
+bool running_away(sf::Sprite&, std::vector<sf::Sprite>&, float);
+bool move(sf::Sprite&,std::vector<sf::Sprite>&,float);
 void check_collision(std::vector<sf::Sprite>&, std::vector<sf::Sprite>&, sf::Texture&, sf::Texture&);
 void check_collision_window(sf::RenderWindow&, std::vector<sf::Sprite>&);
+void check_none_move(sf::Sprite&, std::vector<sf::Sprite>&, std::vector<sf::Sprite>&, float);
 
 std::vector<sf::Sprite> rocks;
 std::vector<sf::Sprite> papers;
 std::vector<sf::Sprite> scissors;
 // * ^ Vectors are needed for displaying and moving, checking co llision, and pretty much everything *
+
+/*
+ ! On the first you put the main sprite,
+ ! on the second you put the stronger sprite,
+ ! on the third you put the weaker sprite,
+ ! and on the fourth you put the main sprite's texure,
+ ! and on fifth you put the speed
+*/
+void check_none_move(sf::Sprite& main_sprite, std::vector<sf::Sprite>& stronger_sprites, std::vector<sf::Sprite>& weaker_sprites, float speed)
+{
+	if (
+	 running_away(main_sprite, stronger_sprites, speed) == false &&
+	 move(main_sprite, weaker_sprites, speed) == false
+	   )
+	{
+        std::mt19937 gen(std::time(0));
+        std::uniform_real_distribution<> dis(-1.0, 1.0);
+        float x = dis(gen);
+        float y = dis(gen);
+        main_sprite.move(x * speed, y * speed);
+	}
+}
+// TODO: Make this function work for every sprite at it's own 
 
 /*
  ! On the first you put the window,
@@ -55,7 +80,7 @@ void check_collision_window(sf::RenderWindow& window, sf::Sprite& sprite)
  ! on the second you put the type of sprites you want the moving_sprite to run away from,
  ! on the third you put the speed 
 */
-void running_away(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& enemy_sprites, float speed)
+bool running_away(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& enemy_sprites, float speed)
 {
 	float radius = 25.0f;
 	sf::CircleShape circle(radius);
@@ -71,9 +96,11 @@ void running_away(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& enemy_spri
 			direction = -direction / length;
 			direction = direction * speed;
 			moving_sprite.move(direction);
-			break;
+			
+			return true;
 		}
 	}
+	return false;
 }
 
 /*
@@ -81,12 +108,12 @@ void running_away(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& enemy_spri
  ! and the sprite you want to move to the right !
  ! the last ons is the speed you want the moving_sprite to move with !
 */
-void move(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& target_sprites, float speed)
+bool move(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& target_sprites, float speed)
 {
 	// * This avoids exception DividingByZero *
 	if (target_sprites.size() == 0)
 	{
-		return;
+		return false;
 	}
 
 	// * Finds the closest sprite in the vector *
@@ -113,6 +140,7 @@ void move(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& target_sprites, fl
 
 	// * Moving the sprite *
 	moving_sprite.move(direction);
+	return true;
 }
 
 /*
@@ -149,6 +177,9 @@ void check_collision(std::vector<sf::Sprite>& master_sprites, std::vector<sf::Sp
 
 int main()
 {
+	// * Bool manipulator *
+	std::cout << std::boolalpha << std::endl;
+
     // * Seed RNG *
     srand(time(NULL));
 
@@ -268,37 +299,25 @@ int main()
 		}
 
 		// * Checking for running away with the rules *
+		// * Moving every vector *
+		// * Checking for none movement
 		for (auto it = rocks.begin() ; it != rocks.end() ; ++it)
 		{
-			running_away(*it, papers, 1.f);
+			check_none_move(*it, papers, scissors, 1.f);
 		}
 		for (auto it = papers.begin() ; it!= papers.end() ; ++it)
 		{
-			running_away(*it, scissors, 1.f);
+			check_none_move(*it, scissors, rocks, 1.f);
 		}
 		for (auto it = scissors.begin() ; it!= scissors.end() ; ++it)
 		{
-			running_away(*it, rocks, 1.f);
+			check_none_move(*it, rocks, papers, 1.f);
 		}
 
 		// * Checking collision for rocks, papers, scissors with the rules *
 		check_collision(rocks, scissors, rock_texture, scissor_texture);
 		check_collision(papers, rocks, paper_texture, rock_texture);
 		check_collision(scissors, papers, scissor_texture, paper_texture);
-
-		// * Moving every vector *
-		for (auto it = rocks.begin() ; it != rocks.end() ; it++)
-		{
-			move(*it, scissors, 1);
-		}
-		for (auto it = papers.begin() ; it != papers.end() ; it++)
-		{
-			move(*it, rocks, 1);
-		}
-		for (auto it = scissors.begin() ; it != scissors.end() ; it++)
-		{
-			move(*it, papers, 1);
-		}
 		
 		// * Making the background to be light grey *
 		sf::Color color{ 181,181,181 }; 

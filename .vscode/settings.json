@@ -78,6 +78,7 @@
     "typeinfo": "cpp",
     "functional": "cpp",
     "numeric": "cpp",
-    "random": "cpp"
+    "random": "cpp",
+    "iomanip": "cpp"
   }
 }
