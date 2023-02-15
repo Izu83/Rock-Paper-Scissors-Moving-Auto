@@ -24,6 +24,25 @@ std::vector<sf::CircleShape> circles;
 
 */
 
+
+/*
+ ! @param text should be a string
+ ! @param position should be 2 floats
+ ! @param size should be 2 floats too
+ ! @param font should be just font
+ ! @param color should be just color
+*/
+class Button
+{
+public:
+	sf::Font font;
+	sf::Text text;
+	sf::RectangleShape shape;
+	Button(sf::Font font, sf::Text text, sf::RectangleShape shape)
+	 : font(font), text(text), shape(shape)
+	{}
+};
+
 // * Function prototypes *
 bool running_away(sf::Sprite&, std::vector<sf::Sprite>&, float);
 bool move(sf::Sprite&,std::vector<sf::Sprite>&,float);
@@ -37,11 +56,10 @@ std::vector<sf::Sprite> scissors;
 // * ^ Vectors are needed for displaying and moving, checking co llision, and pretty much everything *
 
 /*
- ! On the first you put the main sprite,
- ! on the second you put the stronger sprite,
- ! on the third you put the weaker sprite,
- ! and on the fourth you put the main sprite's texure,
- ! and on fifth you put the speed
+ ! On the @param main_sprite you put the main sprite,
+ ! on the @param stronger_sprites you put the stronger sprite,
+ ! on the @param weaker_sprites you put the weaker sprite,
+ ! and on @param speed you put the speed
 */
 void check_none_move(sf::Sprite& main_sprite, std::vector<sf::Sprite>& stronger_sprites, std::vector<sf::Sprite>& weaker_sprites, float speed)
 {
@@ -60,8 +78,8 @@ void check_none_move(sf::Sprite& main_sprite, std::vector<sf::Sprite>& stronger_
 // TODO: Make this function work for every sprite at it's own 
 
 /*
- ! On the first you put the window,
- ! on the second (final) you put the sprite you want to check the collision for
+ ! On the @param window you put the window,
+ ! on the @param sprite you put the sprite you want to check the collision for
 */
 void check_collision_window(sf::RenderWindow& window, sf::Sprite& sprite)
 {
@@ -76,9 +94,10 @@ void check_collision_window(sf::RenderWindow& window, sf::Sprite& sprite)
 }
 
 /*
- ! On the first you put the sprite you want to run away,
- ! on the second you put the type of sprites you want the moving_sprite to run away from,
- ! on the third you put the speed 
+ ! On the @param moving_sprite you put the sprite you want to run away,
+ ! on the @param enemy_sprite you put the type of sprites you want the @param moving_sprite to run away from,
+ ! on the @param speed you put the speed !
+* @return true if the running away was successful, false otherwise *
 */
 bool running_away(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& enemy_sprites, float speed)
 {
@@ -104,9 +123,10 @@ bool running_away(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& enemy_spri
 }
 
 /*
- ! You need to put the sprite you want to move in the left !
- ! and the sprite you want to move to the right !
- ! the last ons is the speed you want the moving_sprite to move with !
+ ! You need to put the sprite you want to move in @param moving_sprites !
+ ! and the sprites you want to move to the @param target_sprites !
+ ! the @param speed is the speed you want the moving_sprite to move with !
+ * @return true if the move was successful, false otherwise.
 */
 bool move(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& target_sprites, float speed)
 {
@@ -144,10 +164,10 @@ bool move(sf::Sprite& moving_sprite, std::vector<sf::Sprite>& target_sprites, fl
 }
 
 /*
- ! Pass the stronger sprites in the first parameter !
- ! Pass the weaker sprites in the seconds parameter !
- ! Pass the stronger sprites texture in the third paramater !
- ! Pass the weaker sprites texture in the fourth parameter !
+ ! Pass the stronger sprites in the @param master_sprites !
+ ! Pass the weaker sprites in the @param weaker_sprites !
+ ! Pass the stronger sprites texture in the @param master_texture !
+ ! Pass the weaker sprites texture in the fourth @param slave_texture !
 */
 void check_collision(std::vector<sf::Sprite>& master_sprites, std::vector<sf::Sprite>& weaker_sprites, sf::Texture& master_texture, sf::Texture& slave_texture)
 {
@@ -174,20 +194,22 @@ void check_collision(std::vector<sf::Sprite>& master_sprites, std::vector<sf::Sp
 	}
 }
 
-
 int main()
 {
+	// * Rendering font *
+	sf::Font font;
+	if (!font.loadFromFile("arial.ttf"))
+	{
+		std::cerr << "There is a problem with opening CascadiaCode.ttf" << std::endl;
+		system("pause");
+		return 1;
+	}
+
 	// * Bool manipulator *
 	std::cout << std::boolalpha << std::endl;
 
     // * Seed RNG *
     srand(time(NULL));
-
-	// * Rendering the window *
-	sf::VideoMode videoMode = sf::VideoMode::getDesktopMode();
-	sf::RenderWindow window(videoMode, "Rock, Paper, Scissors (RPS)", sf::Style::Default);
-	window.setFramerateLimit(60);
-	bool isFullscreen{ false };
 
 	// * Loading the rock texture *
 	sf::Texture rock_texture;
@@ -215,6 +237,27 @@ int main()
 		system("pause");
 		return 1;
 	}
+	
+	// * Rendering the enter number window *
+	sf::RenderWindow window_for_numbers(sf::VideoMode(500, 880), "Enta da numba", sf::Style::Titlebar | sf::Style::Close);
+	window_for_numbers.setFramerateLimit(60);
+	while(window_for_numbers.isOpen())
+	{
+		sf::Event event;
+		while(window_for_numbers.pollEvent(event))
+		{
+			if(event.type == sf::Event::Closed)
+			{
+				window_for_numbers.close();
+			}
+		}
+	}
+	// * Rendering the window for the actuall app *
+	sf::VideoMode videoMode = sf::VideoMode::getDesktopMode();
+	sf::RenderWindow window(videoMode, "Rock, Paper, Scissors (RPS)", sf::Style::Default);
+	window.setFramerateLimit(60);
+	bool isFullscreen{ false };
+
 
 	// * Main game loop *
 	while (window.isOpen())
