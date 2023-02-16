@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include <algorithm>
 #include <iostream>
+#include "Button.h"
 #include <stdlib.h>
 #include <iomanip>
 #include <stdio.h>
@@ -10,7 +11,6 @@
 #include <ctime>
 #include <cmath>
 #include <map>
-
 
 // ? ? ? MAYBE DELETE THIS ? ? ?
 std::vector<sf::CircleShape> circles;
@@ -23,25 +23,6 @@ std::vector<sf::CircleShape> circles;
  ? 3. Paper kills rock, paper goes after rock. ?
 
 */
-
-
-/*
- ! @param text should be a string
- ! @param position should be 2 floats
- ! @param size should be 2 floats too
- ! @param font should be just font
- ! @param color should be just color
-*/
-class Button
-{
-public:
-	sf::Font font;
-	sf::Text text;
-	sf::RectangleShape shape;
-	Button(sf::Font font, sf::Text text, sf::RectangleShape shape)
-	 : font(font), text(text), shape(shape)
-	{}
-};
 
 // * Function prototypes *
 bool running_away(sf::Sprite&, std::vector<sf::Sprite>&, float);
@@ -198,7 +179,7 @@ int main()
 {
 	// * Rendering font *
 	sf::Font font;
-	if (!font.loadFromFile("arial.ttf"))
+	if (!font.loadFromFile("CascadiaCode.ttf"))
 	{
 		std::cerr << "There is a problem with opening CascadiaCode.ttf" << std::endl;
 		system("pause");
@@ -237,6 +218,26 @@ int main()
 		system("pause");
 		return 1;
 	}
+
+	// * Making buttons (pointers) *
+	Button* rock_button = new Button(font, "ROCK", sf::RectangleShape(sf::Vector2f(100.0f,100.0f)));
+	Button* paper_button = new Button(font, "P", sf::RectangleShape(sf::Vector2f(100.0f,100.0f)));
+	Button* scissor_button = new Button(font, "S", sf::RectangleShape(sf::Vector2f(100.0f,100.0f)));
+
+	// * Setting the positions of buttons *
+	rock_button->shape.setPosition(100.0f, 100.0f);
+	rock_button->text.setPosition(sf::Vector2f(rock_button->shape.getPosition().x, rock_button->shape.getPosition().y));
+
+	// * Setting the texts of buttons *
+	rock_button->text.setString("R");
+	rock_button->text.setCharacterSize(24);
+	rock_button->text.setFillColor(sf::Color::Black);
+	rock_button->text.setOutlineThickness(2);
+	rock_button->text.setOutlineColor(sf::Color::Red);
+
+	// * Setting the outside line of the button *
+	rock_button->shape.setOutlineThickness(1.0f);
+	rock_button->shape.setOutlineColor(sf::Color::Red);
 	
 	// * Rendering the enter number window *
 	sf::RenderWindow window_for_numbers(sf::VideoMode(500, 880), "Enta da numba", sf::Style::Titlebar | sf::Style::Close);
@@ -250,6 +251,22 @@ int main()
 			{
 				window_for_numbers.close();
 			}
+			if(event.type == sf::Event::MouseButtonPressed)
+			{
+				if(event.mouseButton.button == sf::Mouse::Left)
+				{
+					sf::Vector2i mousePosition = sf::Mouse::getPosition(window_for_numbers);
+					sf::FloatRect mouseRect(mousePosition.x, mousePosition.y, 1, 1);
+					if (rock_button->shape.getGlobalBounds().intersects(mouseRect))
+					{
+						std::cout << "Rock button clicked" << std::endl;
+					}
+				}
+			}
+			window_for_numbers.clear(sf::Color::White);
+			window_for_numbers.draw(rock_button->shape);
+			window_for_numbers.draw(rock_button->text);
+			window_for_numbers.display();
 		}
 	}
 	// * Rendering the window for the actuall app *
