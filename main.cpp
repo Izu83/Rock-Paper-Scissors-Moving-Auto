@@ -215,6 +215,8 @@ int main()
 		system("pause");
 		return 1;
 	}
+	// * Needing for the key *
+	bool is_enter_pressed { false };
 
 	// * Main game loop *
 	while (window.isOpen())
@@ -232,7 +234,8 @@ int main()
 			if (event.type == sf::Event::KeyPressed)
 			{
 				// * Spawning a rock at mouse position *
-				if (event.key.code == sf::Keyboard::R)
+				if (event.key.code == sf::Keyboard::R && is_enter_pressed == false)
+
 				{
 					sf::Sprite rock(rock_texture);
 					sf::Vector2i mousePos = sf::Mouse::getPosition(window) - sf::Vector2i(32, 32);
@@ -241,7 +244,7 @@ int main()
 					rocks.push_back(rock);
 				}
 				// * Spawning a scissor at mouse position *
-				if (event.key.code == sf::Keyboard::S)
+				if (event.key.code == sf::Keyboard::S && is_enter_pressed == false)
 				{
 					sf::Sprite scissor(scissor_texture);
 					sf::Vector2i mousePos = sf::Mouse::getPosition(window) - sf::Vector2i(32, 32);
@@ -250,7 +253,7 @@ int main()
 					scissors.push_back(scissor);
 				}
 				// * Spawning a paper at mouse position *
-				if (event.key.code == sf::Keyboard::P)
+				if (event.key.code == sf::Keyboard::P && is_enter_pressed == false)
 				{
 					sf::Sprite paper(paper_texture);
 					sf::Vector2i mousePos = sf::Mouse::getPosition(window) - sf::Vector2i(32, 32);
@@ -276,6 +279,10 @@ int main()
 						}
 					}
 				}
+				if ((event.key.code == sf::Keyboard::Enter || event.key.code == sf::Keyboard::Space) && is_enter_pressed == false)
+				{
+					is_enter_pressed = true;
+				}
 				// * Checking for Escape to close the window *
 				if (event.key.code == sf::Keyboard::Escape)
 				{
@@ -283,41 +290,43 @@ int main()
 				}
 			}
 		}
-		
-		// * Checking collision for the sprites and the window
-		for (auto it = rocks.begin() ; it != rocks.end() ; it++)
+		if (is_enter_pressed == true)
 		{
-			check_collision_window(window, *it);
-		}
-		for (auto it = papers.begin() ; it!= papers.end() ; it++)
-		{
-			check_collision_window(window, *it);
-		}
-		for (auto it = scissors.begin() ; it!= scissors.end() ; it++)
-		{
-			check_collision_window(window, *it);
-		}
+			// * Checking collision for the sprites and the window
+			for (auto it = rocks.begin() ; it != rocks.end() ; it++)
+			{
+				check_collision_window(window, *it);
+			}
+			for (auto it = papers.begin() ; it!= papers.end() ; it++)
+			{
+				check_collision_window(window, *it);
+			}
+			for (auto it = scissors.begin() ; it!= scissors.end() ; it++)
+			{
+				check_collision_window(window, *it);
+			}
 
-		// * Checking for running away with the rules *
-		// * Moving every vector *
-		// * Checking for none movement
-		for (auto it = rocks.begin() ; it != rocks.end() ; ++it)
-		{
-			check_none_move(*it, papers, scissors, 1.f);
-		}
-		for (auto it = papers.begin() ; it!= papers.end() ; ++it)
-		{
-			check_none_move(*it, scissors, rocks, 1.f);
-		}
-		for (auto it = scissors.begin() ; it!= scissors.end() ; ++it)
-		{
-			check_none_move(*it, rocks, papers, 1.f);
-		}
+			// * Checking for running away with the rules *
+			// * Moving every vector *
+			// * Checking for none movement
+			for (auto it = rocks.begin() ; it != rocks.end() ; ++it)
+			{
+				check_none_move(*it, papers, scissors, 1.f);
+			}
+			for (auto it = papers.begin() ; it!= papers.end() ; ++it)
+			{
+				check_none_move(*it, scissors, rocks, 1.f);
+			}
+			for (auto it = scissors.begin() ; it!= scissors.end() ; ++it)
+			{
+				check_none_move(*it, rocks, papers, 1.f);
+			}
 
-		// * Checking collision for rocks, papers, scissors with the rules *
-		check_collision(rocks, scissors, rock_texture, scissor_texture);
-		check_collision(papers, rocks, paper_texture, rock_texture);
-		check_collision(scissors, papers, scissor_texture, paper_texture);
+			// * Checking collision for rocks, papers, scissors with the rules *
+			check_collision(rocks, scissors, rock_texture, scissor_texture);
+			check_collision(papers, rocks, paper_texture, rock_texture);
+			check_collision(scissors, papers, scissor_texture, paper_texture);
+		}
 		
 		// * Making the background to be light grey *
 		sf::Color color{ 181,181,181 }; 
@@ -328,7 +337,7 @@ int main()
 		for (auto paper : papers) { window.draw(paper); }
 		for (auto scissor : scissors) { window.draw(scissor); }
 		for (auto circle : circles) { window.draw(circle); }
-		
+
 		// * Clearing circles because it causes
 		// * real big preformance issues *
 		circles.clear();
