@@ -290,21 +290,23 @@ int main()
 				}
 			}
 		}
+
+		// * Checking collision for the sprites and the window
+		for (auto it = rocks.begin() ; it != rocks.end() ; it++)
+		{
+			check_collision_window(window, *it);
+		}
+		for (auto it = papers.begin() ; it!= papers.end() ; it++)
+		{
+			check_collision_window(window, *it);
+		}
+		for (auto it = scissors.begin() ; it!= scissors.end() ; it++)
+		{
+			check_collision_window(window, *it);
+		}
+
 		if (is_enter_pressed == true)
 		{
-			// * Checking collision for the sprites and the window
-			for (auto it = rocks.begin() ; it != rocks.end() ; it++)
-			{
-				check_collision_window(window, *it);
-			}
-			for (auto it = papers.begin() ; it!= papers.end() ; it++)
-			{
-				check_collision_window(window, *it);
-			}
-			for (auto it = scissors.begin() ; it!= scissors.end() ; it++)
-			{
-				check_collision_window(window, *it);
-			}
 
 			// * Checking for running away with the rules *
 			// * Moving every vector *
@@ -322,11 +324,12 @@ int main()
 				check_none_move(*it, rocks, papers, 1.f);
 			}
 
-			// * Checking collision for rocks, papers, scissors with the rules *
-			check_collision(rocks, scissors, rock_texture, scissor_texture);
-			check_collision(papers, rocks, paper_texture, rock_texture);
-			check_collision(scissors, papers, scissor_texture, paper_texture);
 		}
+
+		// * Checking collision for rocks, papers, scissors with the rules *
+		check_collision(rocks, scissors, rock_texture, scissor_texture);
+		check_collision(papers, rocks, paper_texture, rock_texture);
+		check_collision(scissors, papers, scissor_texture, paper_texture);
 		
 		// * Making the background to be light grey *
 		sf::Color color{ 181,181,181 }; 
