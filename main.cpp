@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include <algorithm>
 #include <iostream>
+#include "Button.cpp"
 #include "Button.h"
 #include <stdlib.h>
 #include <iomanip>
@@ -220,7 +221,7 @@ int main()
 	}
 
 	// * Making buttons (pointers) *
-	Button* rock_button = new Button(font, "ROCK", sf::RectangleShape(sf::Vector2f(100.0f,100.0f)));
+	Button* rock_button = new Button(font, "R", sf::RectangleShape(sf::Vector2f(100.0f,100.0f)));
 	Button* paper_button = new Button(font, "P", sf::RectangleShape(sf::Vector2f(100.0f,100.0f)));
 	Button* scissor_button = new Button(font, "S", sf::RectangleShape(sf::Vector2f(100.0f,100.0f)));
 
@@ -229,11 +230,9 @@ int main()
 	rock_button->text.setPosition(sf::Vector2f(rock_button->shape.getPosition().x, rock_button->shape.getPosition().y));
 
 	// * Setting the texts of buttons *
-	rock_button->text.setString("R");
-	rock_button->text.setCharacterSize(24);
-	rock_button->text.setFillColor(sf::Color::Black);
-	rock_button->text.setOutlineThickness(2);
-	rock_button->text.setOutlineColor(sf::Color::Red);
+	rock_button->set_text("R", 24, sf::Color::Black, 0, sf::Color::Black);
+	paper_button->set_text("P", 24, sf::Color::Black, 0, sf::Color::Black);
+	scissor_button->set_text("S", 24, sf::Color::Black, 0, sf::Color::Black);
 
 	// * Setting the outside line of the button *
 	rock_button->shape.setOutlineThickness(1.0f);
@@ -264,11 +263,15 @@ int main()
 				}
 			}
 			window_for_numbers.clear(sf::Color::White);
-			window_for_numbers.draw(rock_button->shape);
-			window_for_numbers.draw(rock_button->text);
+			rock_button->draw(window_for_numbers);
 			window_for_numbers.display();
 		}
 	}
+	// * Deleting pointers (buttons) *
+	delete rock_button;
+	delete paper_button;
+	delete scissor_button;
+
 	// * Rendering the window for the actuall app *
 	sf::VideoMode videoMode = sf::VideoMode::getDesktopMode();
 	sf::RenderWindow window(videoMode, "Rock, Paper, Scissors (RPS)", sf::Style::Default);

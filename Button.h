@@ -18,5 +18,6 @@ public:
 	Button(sf::Font font, std::string text, sf::RectangleShape shape)
 	 : font(font), shape(shape)
 	{ this->text.setString(text); }
-
+    void draw(sf::RenderWindow&);
+    void set_text(std::string str, float char_size, sf::Color text_fill_color, float outline_thickness, sf::Color text_outline_color);
 };
