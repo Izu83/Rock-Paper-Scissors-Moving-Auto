@@ -328,7 +328,7 @@ int main()
 		for (auto paper : papers) { window.draw(paper); }
 		for (auto scissor : scissors) { window.draw(scissor); }
 		for (auto circle : circles) { window.draw(circle); }
-		
+
 		// * Clearing circles because it causes
 		// * real big preformance issues *
 		circles.clear();
